@@ -3,14 +3,14 @@ FROM ubuntu:26.04@sha256:678c6550cc43645e08669028bc177f50be4e7c5b8cca677067b1914
 # Sets an environment variable for the game to install.
 # Supported games: valve, cstrike, czero, dod, dmc, gearbox, ricochet, tfc
 # Default is valve. This gets replaced when building the image with --build-arg GAME=<game>
-ARG GAME=valve
-ENV GAME ${GAME}
+ARG GAME=valve-legacy
+#ENV GAME ${GAME}
 
 # Sets an environment variable for any additional flag that should be passed to the SteamCMD installer.
 # Default is an empty string. This gets replaced when building the image with --build-arg FLAG=<FLAG>
 # For example, you may set this to "-beta steam_legacy".
-ARG FLAG
-ENV FLAG ${FLAG}
+ARG FLAG=-beta steam_legacy
+#ENV FLAG ${FLAG}
 
 # Sets an environment variable for the version of the image.
 ARG VERSION=custom
@@ -19,6 +19,9 @@ ENV VERSION ${VERSION}
 # Sets an environment variable for the image name.
 ARG IMAGE=custom
 ENV IMAGE ${IMAGE}
+
+ARG REHLDS_VERSION=3.15.0.896
+ARG REHLDS_URL="https://github.com/rehlds/ReHLDS/releases/download/$REHLDS_VERSION/rehlds-bin-$REHLDS_VERSION.zip"
 
 # Tags the image with the Open Containers Initiative (OCI) image format.
 LABEL org.opencontainers.image.title="hlds:${GAME}"
@@ -34,7 +37,8 @@ LABEL org.opencontainers.image.version="${VERSION}"
 # Installs the necessary dependencies for the SteamCMD installer.
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
-    apt-get install -y --no-install-recommends curl rsync file tini libc6:i386 lib32stdc++6 ca-certificates && \
+    apt-get install -y --no-install-recommends curl rsync file tini libc6:i386 lib32stdc++6 ca-certificates lsof unzip && \
+    apt-get install -y --no-install-recommends vim && \
     rm -rf /var/lib/apt/lists/*
 
 # Creates a new user and group for the SteamCMD installer.
@@ -74,6 +78,18 @@ RUN rm -f /opt/steam/hlds/libstdc++.so.6 /opt/steam/hlds/libgcc_s.so.1
 RUN mkdir -p $HOME/.steam \
     && ln -s /opt/steam/linux32 $HOME/.steam/sdk32 \
     && echo 70 > /opt/steam/hlds/steam_appid.txt
+
+# RBROWN START
+#
+## Lifted and modified from:
+#   https://github.com/artkirienko/rehlds-docker-reunion/blob/master/Dockerfile
+##
+RUN curl -sLJO "$REHLDS_URL" \
+    && unzip "rehlds-bin-$REHLDS_VERSION.zip" -d "/opt/steam/rehlds" \
+    && cp -R /opt/steam/rehlds/bin/linux32/* /opt/steam/hlds/ \
+    && rm -rf "rehlds-bin-$REHLDS_VERSION.zip" "/opt/steam/rehlds"
+#
+# RBROWN END
 
 WORKDIR /opt/steam/hlds
 

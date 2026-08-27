@@ -2,8 +2,8 @@
 @NoPromptForPassword 1
 force_install_dir ./hlds
 login anonymous
-app_set_config 90 mod $GAME
-app_update 90 $FLAG validate
-app_update 90 $FLAG validate
-app_update 90 $FLAG validate
+app_set_config 90 mod valve
+app_update 90 -beta steam_legacy validate
+app_update 90 -beta steam_legacy validate
+app_update 90 -beta steam_legacy validate
 quit
