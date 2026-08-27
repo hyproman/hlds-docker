@@ -7,6 +7,7 @@ services:
         - FLAG=${FLAG}
         - VERSION=${VERSION}
         - IMAGE=${IMAGE}
+        - REHLDS_INSTALL=${REHLDS_INSTALL}
     volumes:
       - "./config:/temp/config"
       - "./mods:/temp/mods"
@@ -19,4 +20,5 @@ services:
       - FLAG=${FLAG}
       - VERSION=${VERSION}
       - IMAGE=${IMAGE}
+      - REHLDS_INSTALL=${REHLDS_INSTALL}
     command: +maxplayers 12 +log on +rcon_password "changeme" +map crossfire

@@ -20,6 +20,11 @@ ENV VERSION ${VERSION}
 ARG IMAGE=custom
 ENV IMAGE ${IMAGE}
 
+# Set this build argument to install ReHLDS (https://github.com/rehlds/rehlds)
+# Supported values: true (leave blank/unset to skip installation)
+ARG REHLDS_INSTALL
+ENV REHLDS_INSTALL ${REHLDS_INSTALL}
+# ReHLDS download details
 ARG REHLDS_VERSION=3.15.0.896
 ARG REHLDS_URL="https://github.com/rehlds/ReHLDS/releases/download/$REHLDS_VERSION/rehlds-bin-$REHLDS_VERSION.zip"
 
@@ -79,17 +84,18 @@ RUN mkdir -p $HOME/.steam \
     && ln -s /opt/steam/linux32 $HOME/.steam/sdk32 \
     && echo 70 > /opt/steam/hlds/steam_appid.txt
 
-# RBROWN START
-#
-## Lifted and modified from:
+# Install ReHLDS if applicable
+# Lifted and modified from:
 #   https://github.com/artkirienko/rehlds-docker-reunion/blob/master/Dockerfile
-##
-RUN curl -sLJO "$REHLDS_URL" \
-    && unzip "rehlds-bin-$REHLDS_VERSION.zip" -d "/opt/steam/rehlds" \
-    && cp -R /opt/steam/rehlds/bin/linux32/* /opt/steam/hlds/ \
-    && rm -rf "rehlds-bin-$REHLDS_VERSION.zip" "/opt/steam/rehlds"
 #
-# RBROWN END
+RUN if [ "$REHLDS_INSTALL" = "true" ]; then \
+        curl -sLJO "$REHLDS_URL" \
+            && unzip "rehlds-bin-$REHLDS_VERSION.zip" -d "/opt/steam/rehlds" \
+            && cp -R /opt/steam/rehlds/bin/linux32/* /opt/steam/hlds/ \
+            && rm -rf "rehlds-bin-$REHLDS_VERSION.zip" "/opt/steam/rehlds"; \
+    else \
+        echo "Skipped ReHLDS installation"; \
+    fi
 
 WORKDIR /opt/steam/hlds
 
