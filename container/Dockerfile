@@ -3,14 +3,14 @@ FROM ubuntu:26.04@sha256:678c6550cc43645e08669028bc177f50be4e7c5b8cca677067b1914
 # Sets an environment variable for the game to install.
 # Supported games: valve, cstrike, czero, dod, dmc, gearbox, ricochet, tfc
 # Default is valve. This gets replaced when building the image with --build-arg GAME=<game>
-ARG GAME=valve-legacy
-#ENV GAME ${GAME}
+ARG GAME=valve
+ENV GAME ${GAME}
 
 # Sets an environment variable for any additional flag that should be passed to the SteamCMD installer.
 # Default is an empty string. This gets replaced when building the image with --build-arg FLAG=<FLAG>
 # For example, you may set this to "-beta steam_legacy".
-ARG FLAG=-beta steam_legacy
-#ENV FLAG ${FLAG}
+ARG FLAG
+ENV FLAG ${FLAG}
 
 # Sets an environment variable for the version of the image.
 ARG VERSION=custom
